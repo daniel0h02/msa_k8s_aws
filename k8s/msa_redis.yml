@@ -1,0 +1,49 @@
+#버전
+apiVersion: apps/v1
+
+#자원의 종류(pod, sevice, ReplicaSet, Deployment(이게 일반적, replicaset도 포함됨 : 어떻게 운영을 할 것인지 정책들을 reploicaset에서 함))
+kind: Deployment
+
+metadata:
+  name: redis-deployment
+  namespace: lgcns
+    
+
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-pod
+
+  template:
+    metadata:
+      labels:
+        app: redis-pod
+
+    spec:
+    #docker container
+      containers:
+      - name: redis-container
+      # 혹, 실행중인 컨테이너를 이미지를 만들고 ecr 바포할 경우 ecr repo 주소사용 가능
+        image: redis
+        ports:
+          - containerPort: 6379
+
+
+
+
+---  #구분 지어야 함 아래처럼
+#core service setting
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: lgcns
+
+spec: 
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379        # container port를 의미*
+  selector:
+    app: redis-pod      #selector의 name

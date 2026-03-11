@@ -1,0 +1,64 @@
+# eks 배포 시 eureka server를 등록하지 않겠다는 의미 
+eureka:
+  client:
+    enabled: false
+
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+        # cors 처리
+        # 각 서비스 모듈은 웹 브라우저와 직접 통신하지 않으므로 단일 진입점인 gateway가 담당
+        globalcors:
+            cors-configurations:
+                '[/**]':
+                    allowedOrigins:
+                        - 'http://localhost:3000'   # 나중에 S3 endpoint를 넣어주면 됨
+                    allowedMethods: '*'
+                    allowedHeaders: '*'
+                    exposedHeaders: '*'
+                    allowCredentials: true 
+        
+        # eureka server 에 등록된 client 찾아서 시용자의 url_pattern을 매핑하는 작업
+        routes:
+            - id: user-service
+              predicates: 
+                - Path=/user-service/**
+              filters:
+                # 첫번째 접두어를 제거하는 뜻
+                # http://server.xxxxx.shop/user-service(이게 안보일 것임)/users/signIn
+                - StripPrefix=1
+              uri: http://user-service
+
+            - id : product-service
+              predicates:
+              - Path=/product-service/**
+              filters:
+              - StripPrefix=1
+              uri: http://product-service
+
+            - id : order-service
+              predicates:
+              - Path=/order-service/**
+              filters:
+              - StripPrefix=1
+              uri: http://order-service
+
+
+
+
+jwt:
+  secret: daniel-secret-key-for-jwt-123456789
+
+# eureka client user service -> eureka server
+# aws에서 eureka 서버를 service로 대신하기 때문에 주석처리
+# eureka:
+#     client:
+#         serviceUrl:
+#             defaultZone: http://localhost:8761/eureka/
+
+
+

@@ -1,0 +1,34 @@
+package com.example.order.ctrl;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.order.domain.dto.OrderRequestDTO;
+import com.example.order.domain.dto.OrderResponseDTO;
+import com.example.order.service.OrderService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/order")
+@RequiredArgsConstructor
+public class OrderController {
+
+    private final OrderService orderService;
+    
+    @PostMapping("/create")
+    //RequestBody가 있으니 Json으로 내려 받는거다
+    public ResponseEntity<?> orderCreate(@RequestBody OrderRequestDTO request, @RequestHeader("X-User-Email") String email) {
+        System.out.println(">>>> order ctrl path : /create"); 
+        System.out.println(">>>> params : "+ request); 
+
+        OrderResponseDTO response = orderService.orderFignKafkaCreate(request, email);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+    
+}

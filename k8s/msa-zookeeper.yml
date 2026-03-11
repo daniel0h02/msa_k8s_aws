@@ -1,0 +1,49 @@
+#버전
+apiVersion: apps/v1
+
+#자원의 종류(pod, sevice, ReplicaSet, Deployment(이게 일반적, replicaset도 포함됨 : 어떻게 운영을 할 것인지 정책들을 reploicaset에서 함))
+kind: Deployment
+
+metadata:
+  name: zookeeper-deployment
+  namespace: lgcns
+    
+
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+
+    spec:
+    #docker container
+      containers:
+      - name: zookeeper-container
+      # 혹, 실행중인 컨테이너를 이미지를 만들고 ecr 바포할 경우 ecr repo 주소사용 가능
+        image: wurstmeister/zookeeper
+        ports:
+          - containerPort: 2181
+
+
+
+
+---  #구분 지어야 함 아래처럼
+#core service setting
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-service
+  namespace: lgcns
+
+spec: 
+  type: ClusterIP
+  ports:
+  - port: 2181
+    targetPort: 2181        # container port를 의미*
+  selector:
+    app: zookeeper      #selector의 name
