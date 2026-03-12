@@ -47,6 +47,7 @@ jobs:
         # image 생성하고 ecr push까지 자동화
         # apigateway, user, product, order
 
+
         # apigateway
       - name: apigateway build and push docker img to ecr    
         env:      
