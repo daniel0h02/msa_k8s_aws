@@ -79,6 +79,37 @@ jobs:
           kubectl rollout restart deployment user-deployment -n lgcns
 
 
+      # product
+      - name: product build and push docker img to ecr    
+        env:      #외부환경 명령어 주입, 환경 변수
+          REGISTRY: 933090817123.dkr.ecr.us-east-2.amazonaws.com   # ecr엔드포인트, .com까지만
+          REPOSITORY: product-service      # 그 뒤는 여기에
+          IMAGE_TAG: latest     # 버전
+        run: |          # 역슬레시, 그룹화 시킬 때 씀
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./product/Dockerfile ./product   # 위에 변수 참조   
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: eks kubectl product apply
+        run: |
+          kubectl apply -f ./product/k8s/product-deply.yml
+          kubectl rollout restart deployment product-deployment -n lgcns
+
+      
+      # order
+      - name: order build and push docker img to ecr    
+        env:      #외부환경 명령어 주입, 환경 변수
+          REGISTRY: 933090817123.dkr.ecr.us-east-2.amazonaws.com   # ecr엔드포인트, .com까지만
+          REPOSITORY: order-service      # 그 뒤는 여기에
+          IMAGE_TAG: latest     # 버전
+        run: |          # 역슬레시, 그룹화 시킬 때 씀
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f ./order/Dockerfile ./order   # 위에 변수 참조   
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      - name: eks kubectl order apply
+        run: |
+          kubectl apply -f ./order/k8s/order-deply.yml
+          kubectl rollout restart deployment order-deployment -n lgcns
+
 
       
       
