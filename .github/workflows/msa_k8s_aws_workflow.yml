@@ -26,6 +26,25 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_KEY }}             
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}  
           aws-region: us-east-2  
+      
+      - name: aws_eks_cluster update
+        run: aws eks update-kubeconfig --region us-east-2 --name lgcns-daniel-cluster
+
+
+      - name: aws ecr login       
+        uses: aws-actions/amazon-ecr-login@v1
+
+
+        # 인프라 구축(ingress, kafka, redis, zookeeper, rabbitMQ)
+      - name: deploy infra     
+        # 로컬에 잇는 파일 경로 기준이 아닌 git에 올라 가 있는 기준
+        run: |
+          kubectl apply -f ./k8s/msa_ingress.yml
+          kubectl apply -f ./k8s/msa-kafka.yml
+          kubectl apply -f ./k8s/msa-zookeeper.yml
+          kubectl apply -f ./k8s/msa_redis.yml
+
+
 
       
       
