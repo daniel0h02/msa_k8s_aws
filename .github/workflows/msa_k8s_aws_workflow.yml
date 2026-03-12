@@ -52,6 +52,7 @@ jobs:
           REPOSITORY: api-gateway      # 그 뒤는 여기에
           IMAGE_TAG: latest     # 버전
         run: |          # 역슬레시, 그룹화 시킬 때 씀
+          cd apigateway
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -f Dockerfile .   # 위에 변수 참조   
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
